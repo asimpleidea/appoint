@@ -3,14 +3,13 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"net/url"
 	"os"
 	"os/signal"
 	"strconv"
-	"strings"
 	"time"
 
+	coredb "github.com/asimpleidea/appoint/api/core/pkg/database"
 	"github.com/asimpleidea/appoint/api/services/internal/database"
 	"github.com/asimpleidea/appoint/api/services/pkg/types"
 	"github.com/gofiber/fiber/v2"
@@ -27,44 +26,8 @@ var (
 	log zerolog.Logger
 )
 
-// TODO: this must be put somewhere because used frequently
-type DatabaseOptions struct {
-	Host     string `json:"host" yaml:"host"`
-	Port     int    `json:"port" yaml:"port"`
-	User     string `json:"user" yaml:"user"`
-	Password string `json:"password" yaml:"password"`
-	Name     string `json:"name" yaml:"name"`
-	SSLMode  bool   `json:"ssl_mode" yaml:"sslMode"`
-	Timezone string `json:"timezone" yaml:"timezone"`
-}
-
-func generatePostgresDSN(opts DatabaseOptions) string {
-	data := map[string]string{
-		"host":     opts.Host,
-		"port":     strconv.Itoa(opts.Port),
-		"user":     opts.User,
-		"password": opts.Password,
-		"dbname":   opts.Name,
-		"sslmode": func() string {
-			if opts.SSLMode {
-				return "enable"
-			}
-
-			return "disable"
-		}(),
-		"timeZone": opts.Timezone,
-	}
-
-	dsn := []string{}
-	for k, v := range data {
-		dsn = append(dsn, fmt.Sprintf("%s=%s", k, v))
-	}
-
-	return strings.Join(dsn, " ")
-}
-
 func main() {
-	dbOpts := &DatabaseOptions{}
+	dbOpts := &coredb.Options{}
 	verbosity := 1
 	var ops *database.Database
 
@@ -107,7 +70,7 @@ func main() {
 	// Connect to the database
 	// -----------------------------------------
 
-	dsn := generatePostgresDSN(*dbOpts)
+	dsn := coredb.GeneratePostgresDSN(*dbOpts)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

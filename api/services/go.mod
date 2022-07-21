@@ -3,6 +3,7 @@ module github.com/asimpleidea/appoint/api/services
 go 1.18
 
 require (
+	github.com/asimpleidea/appoint/api/core v0.0.0-00010101000000-000000000000
 	github.com/gofiber/fiber/v2 v2.35.0
 	github.com/rs/zerolog v1.15.0
 	gorm.io/driver/postgres v1.3.8
@@ -29,3 +30,5 @@ require (
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
+
+replace github.com/asimpleidea/appoint/api/core => ../core
